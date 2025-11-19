@@ -1,49 +1,63 @@
-# GAME_PROGRAM-EX--4
-# Attach Rifle with character mesh and implementation bullet spawn from Rifle
-## AIM
-To create an aiming system (attach and aim a rifle with a character) in Unreal Engine,you’re using a third-person character and a rifle skeletal mesh.
+# GAME_PROGRAM-EX--5
+## Making Player to collect the ammo and increase the bullet spawn count.
+##  Aim
+To implement a gameplay feature where the player collects ammo pickups in the game world. Upon collecting ammo, the player's ammo count increases, enabling more bullet spawns (shots).
 
+---
 
 ## Procedure
 
-### 1.Attach the Rifle to the Character
+### 1. Setup Player Character
 
-Import the Rifle Skeletal Mesh into Unreal Engine.
-Open your Character Blueprint (e.g., BP_ThirdPersonCharacter).
-In the Components tab:
-Add a Skeletal Mesh or Static Mesh component (name it Rifle).
-Set its Skeletal Mesh to your rifle asset.
+- Open your `PlayerCharacter` Blueprint.s
+- Add a new **Integer** variable named `AmmoCount`.
+- Set an initial default value (e.g., `AmmoCount = 10`).
+- Ensure you have a shooting mechanism in place that uses `AmmoCount` to determine if a bullet can be fired.
 
-### 2.Attach the Rifle to a socket on the character’s skeleton:
+### 2. Create Ammo Pickup Blueprint
 
-In the Rifle component, set the Parent Socket to something like hand_r (right hand socket).
+- Go to the Content Browser → Right-click → **Blueprint Class** → Select **Actor** → Name it `BP_AmmoPickup`.
+- Add components:
+  - **Static Mesh**: Representing the ammo (e.g., a bullet or crate).
+  - **Sphere Collision**: To detect overlap with the player.
+- In the Event Graph of `BP_AmmoPickup`:
+  - Use `OnComponentBeginOverlap` on the Sphere Collision.
+  - Cast to `PlayerCharacter`.
+  - Increase the player’s `AmmoCount` (e.g., `AmmoCount += 5`).
+  - Optionally, play a pickup sound or effect.
+  - Destroy the ammo pickup actor.
 
-manually attach in Event Graph:
-```
-Rifle->AttachToComponent(Mesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, "hand_rSocket");
-```
+### 3. Update Shooting Logic (Optional)
 
-### 3. Add Aiming Mechanism
+- In your player’s shooting logic:
+  - Before spawning a bullet, check `if AmmoCount > 0`.
+  - If true:
+    - Spawn bullet.
+    - Decrease `AmmoCount` by 1.
 
-Create a Boolean variable called IsAiming.
-Set up Input in Project Settings:
-Go to Edit > Project Settings > Input.
-Add an Action Mapping named Aim (e.g., Right Mouse Button).
+### 4. Place Ammo in the World
 
-### 4. Adjust Camera When Aiming
+- Drag instances of `BP_AmmoPickup` into your level from the Content Browser.
+- Adjust position, mesh, and pickup range as needed.
 
-Add a Camera Boom and Follow Camera.
-
-In Event Graph:
-```
-When IsAiming = true, zoom the camera in (FOV) and slightly shift it over the shoulder.
-```
+---
 
 ## Output
-![rifle man](https://github.com/user-attachments/assets/3b5ae058-072c-4bc4-96ba-5374565482f6)
+
+![Screenshot 2025-05-14 140722](https://github.com/user-attachments/assets/ad7eefea-575c-44ae-9eca-6e9a623a8ef4)
+
+![Screenshot 2025-05-14 140736](https://github.com/user-attachments/assets/e82640a3-06c3-48e0-9abd-11a2e60640ba)
 
 
-![rifle bluprint](https://github.com/user-attachments/assets/8bb07417-9197-4bb5-9f05-c200cbc77c67)
+![image](https://github.com/user-attachments/assets/ca2adaf2-d5b2-42fc-a40e-a81d6d69d965)
+
+![image](https://github.com/user-attachments/assets/e28cfc27-f127-40cf-94ba-e95d5fa1901f)
+
 
 ##  Result
-Attach Rifle with character mesh and implementation bullet spawn from Rifle is successfully done.
+
+- The player starts with a limited number of bullets.
+- When the player overlaps with an ammo pickup:
+  - The ammo is collected.
+  - The player's `AmmoCount` increases.
+- The player can now fire additional bullets based on the updated ammo count.
